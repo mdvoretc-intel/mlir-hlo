@@ -308,11 +308,6 @@ struct TilingPattern : public OpInterfaceRewritePattern<TilingInterface> {
           op, "missing tile size computation function");
     }
 
-    // Implement adding accumulator to the gml_st.parallel terminator.
-    if (options.distribute && llvm::count(op.getLoopIteratorTypes(),
-                                          utils::IteratorType::reduction) > 0)
-      return failure();
-
     // 1. Get the range of the loops that are represented by the operation.
     SmallVector<Range> iterationDomain = op.getIterationDomain(rewriter);
     size_t numLoops = iterationDomain.size();
@@ -327,6 +322,12 @@ struct TilingPattern : public OpInterfaceRewritePattern<TilingInterface> {
     {
       OpBuilder::InsertionGuard guard(rewriter);
       tileSizeVector = options.tileSizeComputationFn(rewriter, op);
+    }
+    // Implement adding accumulator to the gml_st.parallel terminator.
+    if (options.distribute) {
+      for (size_t i = 0; i < tileSizeVector.size(); ++i)
+        if (op.getLoopIteratorTypes()[i] == utils::IteratorType::reduction)
+          return failure();
     }
     if (tileSizeVector.size() < iterationDomain.size()) {
       auto zero = rewriter.create<arith::ConstantIndexOp>(op.getLoc(), 0);

@@ -89,6 +89,14 @@ def GmlStToGpuPass : Pass<"gml-st-to-gpu", "mlir::func::FuncOp"> {
                            "::mlir::vector::VectorDialect"];
 }
 
+def GmlStToGpu2dPass : Pass<"gml-st-to-gpu-2d", "mlir::func::FuncOp"> {
+  let summary = "Lower nested 2D `gml_st.parallel` to `gpu.launch`";
+  let dependentDialects = ["::mlir::AffineDialect",
+                           "::mlir::arith::ArithDialect",
+                           "::mlir::gpu::GPUDialect", "::mlir::scf::SCFDialect",
+                           "::mlir::vector::VectorDialect"];
+}
+
 def TiledLoopBufferizePass :
     Pass<"gml-tiled-loop-bufferize", "mlir::func::FuncOp"> {
   let summary = "Pass to bufferize linalg.tiled_loop with the ops inside it.";

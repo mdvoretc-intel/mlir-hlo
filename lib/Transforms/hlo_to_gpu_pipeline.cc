@@ -55,12 +55,10 @@ void mlir::createHloToGpuPipeline(OpPassManager& pm,
   pm.addNestedPass<FuncOp>(createLinalgElementwiseOpFusionPass());
 
   // Tiling
-  pm.addNestedPass<FuncOp>(gml_st::createTilingCwisePass(
-      /*distribute=*/true, SmallVector<int64_t>(blockTileDim)));
-  pm.addNestedPass<FuncOp>(gml_st::createTilingCwisePass(
-      /*distribute=*/true, SmallVector<int64_t>(warpTileDim)));
-  pm.addNestedPass<FuncOp>(gml_st::createTilingCwisePass(
-      /*distribute=*/true, SmallVector<int64_t>(threadTileDim)));
+  pm.addNestedPass<FuncOp>(gml_st::createTilingPass(
+      "", "", /*distribute=*/true, SmallVector<int64_t>(blockTileDim)));
+  pm.addNestedPass<FuncOp>(gml_st::createTilingPass(
+      "", "", /*distribute=*/true, SmallVector<int64_t>(warpTileDim)));
   pm.addNestedPass<FuncOp>(gml_st::createTilingReductionPass());
   pm.addNestedPass<FuncOp>(createScalarizationPass());
 
@@ -76,7 +74,7 @@ void mlir::createHloToGpuPipeline(OpPassManager& pm,
   pm.addNestedPass<FuncOp>(bufferization::createBufferDeallocationPass());
 
   // Linalg + GmlSt -> GPU
-  pm.addNestedPass<FuncOp>(createGmlStToGpuPass());
+  pm.addNestedPass<FuncOp>(createGmlStToGpu2dPass());
   pm.addNestedPass<FuncOp>(arith::createArithExpandOpsPass());
   pm.addNestedPass<FuncOp>(createConvertLinalgToLoopsPass());
   pm.addNestedPass<FuncOp>(createCanonicalizerPass());

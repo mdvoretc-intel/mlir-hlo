@@ -47,7 +47,7 @@ cmake -GNinja \
   -DLLVM_ENABLE_BINDINGS=OFF \
   -DLLVM_BUILD_TOOLS=OFF \
   -DLLVM_INCLUDE_TESTS=OFF \
-  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  -DCMAKE_BUILD_TYPE=Debug \
   -DLLVM_ENABLE_ASSERTIONS=On
 
-cmake --build "$build_dir" --target all --target mlir-cpu-runner
+cmake --build "$build_dir" --target all --target mlir-cpu-runner -- -j8
